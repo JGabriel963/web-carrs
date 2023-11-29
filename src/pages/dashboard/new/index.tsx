@@ -16,7 +16,7 @@ const schema = z.object({
   whatsapp: z
     .string()
     .min(1, "O Telefone é obrigatório")
-    .refine((value) => /^(\d{10,11})$/.test(value), {
+    .refine((value) => /^(\d{11,12})$/.test(value), {
       message: "Número de telefone inválido",
     }),
   description: z.string().nonempty("A descrição é obrigatória"),
@@ -58,7 +58,7 @@ export function New() {
         </button>
       </div>
 
-      <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-2">
+      <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-2 mb-7">
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <div className="mb-3">
             <p className="mb-2 font-medium">Nome do carro</p>
@@ -80,6 +80,98 @@ export function New() {
               placeholder="Ex.:1.0 Flex PLUS MANUAL..."
             />
           </div>
+          <div className="mb-3">
+            <p className="mb-2 font-medium">Modelo do carro</p>
+            <Input
+              type="text"
+              register={register}
+              name="model"
+              error={errors.model?.message}
+              placeholder="Ex.:1.0 Flex PLUS MANUAL..."
+            />
+          </div>
+          <div className="flex w-full mb-3 items-center gap-4">
+            <div className="w-full">
+              <p className="mb-2 font-medium">Ano</p>
+              <Input
+                type="text"
+                register={register}
+                name="year"
+                error={errors.year?.message}
+                placeholder="Ex.:1.0 2016/2016..."
+              />
+            </div>
+
+            <div className="w-full">
+              <p className="mb-2 font-medium">KM rodados</p>
+              <Input
+                type="text"
+                register={register}
+                name="km"
+                error={errors.km?.message}
+                placeholder="Ex.: 23.900..."
+              />
+            </div>
+          </div>
+
+          <div className="flex w-full mb-3 items-center gap-4">
+            <div className="w-full">
+              <p className="mb-2 font-medium">Telefone / Whatsapp</p>
+              <Input
+                type="text"
+                register={register}
+                name="whatsapp"
+                error={errors.whatsapp?.message}
+                placeholder="Ex.: 86988923098..."
+              />
+            </div>
+
+            <div className="w-full">
+              <p className="mb-2 font-medium">Cidade</p>
+              <Input
+                type="text"
+                register={register}
+                name="city"
+                error={errors.city?.message}
+                placeholder="Ex.: Teresina - PI..."
+              />
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <p className="mb-2 font-medium">Preço</p>
+            <Input
+              type="text"
+              register={register}
+              name="price"
+              error={errors.price?.message}
+              placeholder="Ex.: R$ 69.00.."
+            />
+          </div>
+
+          <div className="w-full">
+            <p className="mb-2 font-medium">Preço</p>
+            <textarea
+              className="border-2 w-full rounded-md h-24 px-2"
+              {...register("description")}
+              id="description"
+              placeholder="Digite a descrição completa sobre o carro..."
+            />
+
+            {errors.description && (
+              <p className="my-1 text-red-500">
+                {" "}
+                {errors.description.message}{" "}
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full h-10 rounded-md bg-zinc-900 text-white font-medium"
+          >
+            Cadastrar
+          </button>
         </form>
       </div>
     </Container>
