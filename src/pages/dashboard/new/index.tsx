@@ -5,6 +5,17 @@ import { useForm } from "react-hook-form";
 import { Input } from "../../../components/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ChangeEvent, useContext } from "react";
+import { AuthContext } from "../../../context/AuthContext";
+import { v4 as uuidV4 } from "uuid";
+
+import { storage } from "../../../services/firebase";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 
 const schema = z.object({
   name: z.string().min(1, "O campo nome é obrigatório"),
@@ -25,6 +36,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function New() {
+  const { user } = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
@@ -34,6 +47,36 @@ export function New() {
     resolver: zodResolver(schema),
     mode: "onChange",
   });
+
+  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const image = e.target.files[0];
+
+      if (image.type === "image/jpeg" || image.type === "image/png") {
+        await handleUpload(image);
+      } else {
+        alert("Send a image jpeg or png!");
+        return;
+      }
+    }
+  }
+
+  async function handleUpload(image: File) {
+    if (!user?.uid) {
+      return;
+    }
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
+
+    uploadBytes(uploadRef, image).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((downloadUrl) => {
+        console.log(downloadUrl);
+      });
+    });
+  }
 
   function onSubmit(data: FormData) {
     console.log(data);
@@ -52,7 +95,8 @@ export function New() {
             <input
               className="opacity-0 cursor-pointer"
               type="file"
-              accept="image/"
+              accept="image/*"
+              onChange={handleFile}
             />
           </div>
         </button>
@@ -68,16 +112,6 @@ export function New() {
               name="name"
               error={errors.name?.message}
               placeholder="Ex.: Onix 1.0..."
-            />
-          </div>
-          <div className="mb-3">
-            <p className="mb-2 font-medium">Modelo do carro</p>
-            <Input
-              type="text"
-              register={register}
-              name="model"
-              error={errors.model?.message}
-              placeholder="Ex.:1.0 Flex PLUS MANUAL..."
             />
           </div>
           <div className="mb-3">
@@ -150,7 +184,7 @@ export function New() {
           </div>
 
           <div className="w-full">
-            <p className="mb-2 font-medium">Preço</p>
+            <p className="mb-2 font-medium">Descrição</p>
             <textarea
               className="border-2 w-full rounded-md h-24 px-2"
               {...register("description")}
