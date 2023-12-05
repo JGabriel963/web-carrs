@@ -9,13 +9,15 @@ import { ChangeEvent, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { v4 as uuidV4 } from "uuid";
 
-import { storage } from "../../../services/firebase";
+import { storage, db } from "../../../services/firebase";
 import {
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
+import { addDoc, collection } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().min(1, "O campo nome é obrigatório"),
@@ -63,7 +65,7 @@ export function New() {
       if (image.type === "image/jpeg" || image.type === "image/png") {
         await handleUpload(image);
       } else {
-        alert("Send a image jpeg or png!");
+        toast.error("Send a image jpeg or png!");
         return;
       }
     }
@@ -106,7 +108,42 @@ export function New() {
   }
 
   function onSubmit(data: FormData) {
-    console.log(data);
+    if (carImages.length === 0) {
+      toast.error("Insira no mínimo uma image!");
+      return;
+    }
+
+    const carListImages = carImages.map((car) => {
+      return {
+        uid: car.uid,
+        name: car.name,
+        url: car.url,
+      };
+    });
+
+    addDoc(collection(db, "cars"), {
+      name: data.name,
+      model: data.model,
+      whatsapp: data.whatsapp,
+      city: data.city,
+      year: data.year,
+      km: data.km,
+      price: data.price,
+      description: data.description,
+      created: new Date(),
+      owner: user?.name,
+      uid: user?.uid,
+      images: carListImages,
+    })
+      .then(() => {
+        reset();
+        setCarImages([]);
+        toast.success("Carro cadastrado!");
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Erro ao cadastrar carro!");
+      });
   }
 
   return (
