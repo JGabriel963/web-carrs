@@ -75,8 +75,8 @@ export function Home() {
 
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {cars.map((car) => (
-          <Link to={`/car/${car.id}`}>
-            <section key={car.id} className="w-full bg-white rounded-lg">
+          <Link key={car.id} to={`/car/${car.id}`}>
+            <section className="w-full bg-white rounded-lg">
               <div
                 className="w-full h-72 rounded-lg bg-slate-200"
                 style={{
