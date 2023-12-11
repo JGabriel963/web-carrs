@@ -60,12 +60,12 @@ export function Register() {
           email: data.email,
           uid: user.user.uid,
         });
-        toast.success("Usuário cadastrado com sucesso")
+        toast.success("Bem vindo ao webcarros!");
         navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
         console.log(error);
-        toast.error("Erro ao tentar cadastrar-se")
+        toast.error("Erro ao tentar cadastrar-se");
       });
   }
 
