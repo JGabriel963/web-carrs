@@ -5,10 +5,16 @@ import { Input } from "../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { auth } from "../../services/firebase";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import { FaGoogle } from "react-icons/fa";
 
 const schema = z.object({
   email: z
@@ -44,12 +50,26 @@ export function Login() {
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((user) => {
         console.log(user);
-        toast.success("Usuário logado com sucesso")
+        toast.success("Usuário logado com sucesso");
         navigate("/dashboard", { replace: true });
       })
       .catch((err) => {
-        toast.error("Erro ao tentar logar")
+        toast.error("Erro ao tentar logar");
         console.log(err);
+      });
+  }
+
+  function handleGoogleSignIn() {
+    const provider = new GoogleAuthProvider();
+
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result.user);
+        toast.success("Usuário logado com sucesso");
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -91,6 +111,15 @@ export function Login() {
             Acessar
           </button>
         </form>
+
+        <div className="w-full bg-white max-w-xl flex justify-center py-1">
+          <button
+            onClick={handleGoogleSignIn}
+            className="p-2 rounded-full border border-zinc-900"
+          >
+            <FaGoogle />
+          </button>
+        </div>
 
         <Link to="/register">Ainda não possui uma conta? Cadastre-se</Link>
       </div>
